@@ -94,6 +94,10 @@ public class DomainInfo {
         return allInfo;
     }
 
+    /**
+     *
+     * @return all information about domain in JSON format
+     */
     public String getJSONInfo() {
         Gson gson = new Gson();
         return gson.toJson(this);
