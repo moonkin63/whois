@@ -29,25 +29,29 @@ public class DomainInfo {
     protected String expiredDate;
     protected String freeDate;
 
-    public DomainInfo(String domain) throws IOException {
-        Document doc = Jsoup.connect("https://www.reg.ru/whois/?dname=" + domain).userAgent("Mozilla").get();
-        Element div_block = doc.select("div.whois_block_content").first();
-        Element table = div_block.select("table").first();
-        Elements tds = table.select("td");
-        String paramName = "";
-        Map<String, String> params = new HashMap<String, String>();
-        for (Element td : tds) {
-            if (paramName.isEmpty()) {
-                paramName = td.text();
-            } else {
-                if (params.containsKey(paramName)) {
-                    paramName += "2";
+    public DomainInfo(String domain) throws Exception {
+        try {
+            Document doc = Jsoup.connect("https://www.reg.ru/whois/?dname=" + domain).userAgent("Mozilla").get();
+            Element div_block = doc.select("div.whois_block_content").first();
+            Element table = div_block.select("table").first();
+            Elements tds = table.select("td");
+            String paramName = "";
+            Map<String, String> params = new HashMap<String, String>();
+            for (Element td : tds) {
+                if (paramName.isEmpty()) {
+                    paramName = td.text();
+                } else {
+                    if (params.containsKey(paramName)) {
+                        paramName += "2";
+                    }
+                    params.put(paramName, td.text());
+                    paramName = "";
                 }
-                params.put(paramName, td.text());
-                paramName = "";
             }
+            setParameters(params);
+        } catch (Exception e) {
+            throw new Exception("can't load domain info");
         }
-        setParameters(params);
     }
 
     protected void setParameters(Map<String, String> params) {
@@ -95,7 +99,6 @@ public class DomainInfo {
     }
 
     /**
-     *
      * @return all information about domain in JSON format
      */
     public String getJSONInfo() {
