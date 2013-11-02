@@ -14,6 +14,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.net.IDN;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ public class DomainInfo {
 
     public DomainInfo(String domain) throws Exception {
         try {
+            domain = convertURL(domain);
             Document doc = Jsoup.connect("https://www.reg.ru/whois/?dname=" + domain).userAgent("Mozilla").get();
             Element div_block = doc.select("div.whois_block_content").first();
             Element table = div_block.select("table").first();
@@ -52,6 +54,10 @@ public class DomainInfo {
         } catch (Exception e) {
             throw new Exception("can't load domain info");
         }
+    }
+
+    protected static String convertURL(String url) {
+        return IDN.toASCII(url);
     }
 
     protected void setParameters(Map<String, String> params) {
